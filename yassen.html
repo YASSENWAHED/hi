@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deploy Panel</title>
+  <style>
+    body {
+      background-image: url("https://telegra.ph/file/895541580f56406caedbd.png"); /* Replace with your image URL */
+      background-size: cover;
+      color: #fff; /* White text */
+      font-family: monospace;
+    }
+    .container {
+      width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black for contrast */
+      border-radius: 10px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff; /* White heading */
+    }
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+    code {
+      background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent black background for code */
+      padding: 5px;
+      border-radius: 5px;
+      display: block;
+      margin-bottom: 10px;
+      color: #fff; /* White code text */
+    }
+    button {
+      background-color: #007bff; /* Blue button background */
+      color: #fff; /* White button text */
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+    pre {
+      background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent black background for pre-formatted code */
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      color: #fff; /* White pre-formatted code text */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Deploy Panel</h1>
+    <ul>
+      <li>Click <strong>New File</strong></li>
+      <li>Name it <code>index.js</code> or <code>main.js</code> as the panel startup script.</li>
+      <li>Paste the code below and change <code>SESSION_ID</code></li>
+    </ul>
+    <pre>
+      <code>
+        const { spawnSync } = require('child_process');
+        const { existsSync, writeFileSync } = require('fs');
+        const SESSION_ID = 'updateThis';
+        if (!existsSync('levanter')) {
+          console.log('Cloning the repos');
+          const cloneResult = spawnSync('git', [
+            'clone',
+            'https://github.com/levanter/levanter.git'
+          ], {
+            stdio: 'inherit',
+          });
+        }
+        if (cloneResult.error) {
+          throw new Error('Failed to clone repository');
+        }
+        const configPath = 'levanter/config.json';
+        try {
+          console.log('Writing to config file');
+          writeFileSync(configPath, JSON.stringify({
+            SESSION_ID: SESSION_ID
+          }));
+        } catch (err) {
+          console.log(`Error writing to config file: ${err}`);
+        }
+      </code>
+    </pre>
+    <button id="copyButton">Copy</button>
+  </div>
+  <script>
+    const copyButton = document.getElementById('copyButton');
+    const codeBlock = document.querySelector('pre code');
+    copyButton.addEventListener('click', () => {
+      navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+        copyButton.textContent = 'Copied!';
+        setTimeout(() => {
+          copyButton.textContent = 'Copy';
+        }, 1500);
+      });
+    });
+  </script>
+</body>
+</html>
